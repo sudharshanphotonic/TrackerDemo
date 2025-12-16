@@ -1,102 +1,65 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function InstallerDisplayRegister() {
   const params = new URLSearchParams(window.location.search);
   const deviceId = params.get("deviceId");
 
-  const [login, setLogin] = useState({ username: "", password: "" });
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
+  const [error, setError] = useState("");
 
-  const [form, setForm] = useState({
-    displayName: "",
-    installerName: "",
-    latitude: "",
-    longitude: "",
-  });
-
-  // Block access if QR not scanned
+  // Block if QR not scanned
   if (!deviceId) {
     return <h3>❌ Scan QR from display to continue</h3>;
   }
 
-  // Static GPS (demo)
-  useEffect(() => {
-    setForm((f) => ({
-      ...f,
-      latitude: "12.9716",
-      longitude: "77.5946",
-    }));
-  }, []);
-
   const handleLogin = () => {
-    if (login.username === "psdas" && login.password === "psdas") {
+    const u = username.trim().toLowerCase();
+    const p = password.trim();
+
+    if (u === "psdas" && p === "psdas") {
       setLoggedIn(true);
+      setError("");
     } else {
-      alert("Invalid login");
+      setError("Invalid username or password");
     }
   };
 
   return (
-    <div style={{ maxWidth: 500, padding: 20 }}>
-      <h2>Installer – Register Display</h2>
+    <div style={{ maxWidth: 400, padding: 20 }}>
+      <h2>Installer Login</h2>
 
       {!loggedIn ? (
         <>
-          <h3>Installer Login</h3>
-
           <input
             placeholder="Username"
-            onChange={(e) =>
-              setLogin({ ...login, username: e.target.value })
-            }
+            value={username}
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            onChange={(e) => setUsername(e.target.value)}
           />
           <br /><br />
 
           <input
             type="password"
             placeholder="Password"
-            onChange={(e) =>
-              setLogin({ ...login, password: e.target.value })
-            }
+            value={password}
+            autoCapitalize="none"
+            autoCorrect="off"
+            onChange={(e) => setPassword(e.target.value)}
           />
           <br /><br />
 
           <button onClick={handleLogin}>Login</button>
+
+          {error && (
+            <p style={{ color: "red", marginTop: 10 }}>{error}</p>
+          )}
         </>
       ) : (
-        <>
-          <p><b>Device UID:</b> {deviceId}</p>
-
-          <input
-            placeholder="Display Name"
-            onChange={(e) =>
-              setForm({ ...form, displayName: e.target.value })
-            }
-          />
-          <br /><br />
-
-          <input
-            placeholder="Installer Name"
-            onChange={(e) =>
-              setForm({ ...form, installerName: e.target.value })
-            }
-          />
-          <br /><br />
-
-          <p>📍 Latitude: {form.latitude}</p>
-          <p>📍 Longitude: {form.longitude}</p>
-
-          <hr />
-          <h3>Preview</h3>
-
-          <div style={{ background: "#f2f2f2", padding: 10 }}>
-            <p><b>Device:</b> {deviceId}</p>
-            <p><b>Display:</b> {form.displayName}</p>
-            <p><b>Installer:</b> {form.installerName}</p>
-            <p><b>Lat:</b> {form.latitude}</p>
-            <p><b>Lng:</b> {form.longitude}</p>
-          </div>
-        </>
+        <h3>✅ Login Success – Continue Installation</h3>
       )}
     </div>
   );
