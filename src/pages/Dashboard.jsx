@@ -1,10 +1,19 @@
-export default function Dashboard() {
+export default function Dashboard({ displayCount = 0, loading = false }) {
   return (
     <div>
       <h2>Dashboard</h2>
 
-      {/* Static Counts */}
+      {/* Counts */}
       <div style={{ display: "flex", gap: 20, marginBottom: 20 }}>
+        {/* 🔢 Total Displays (from backend) */}
+        <div style={{ padding: 20, background: "#e0f2fe", width: 180 }}>
+          <h4>Total Displays</h4>
+          <p style={{ fontSize: 24, fontWeight: "bold" }}>
+            {loading ? "Loading..." : displayCount}
+          </p>
+        </div>
+
+        {/* Static cards (unchanged) */}
         <div style={{ padding: 20, background: "#eee", width: 150 }}>
           <h4>Total Buses</h4>
           <p>12</p>
