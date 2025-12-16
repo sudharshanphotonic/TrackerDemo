@@ -26,10 +26,12 @@ export default function Home() {
     }
   };
 
-  // initial load
+  // 🔁 Refresh count whenever Dashboard is opened
   useEffect(() => {
-    fetchDisplayCount();
-  }, []);
+    if (view === "dashboard") {
+      fetchDisplayCount();
+    }
+  }, [view]);
 
   return (
     <div style={{ display: "flex" }}>
