@@ -24,6 +24,8 @@ export default function InstallerDisplayRegister() {
   });
 
   const [locationError, setLocationError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   // ❌ Block if QR not scanned
   if (!deviceId) {
@@ -47,7 +49,7 @@ export default function InstallerDisplayRegister() {
           longitude: position.coords.longitude.toFixed(6),
         }));
       },
-      (err) => {
+      () => {
         setLocationError("Location permission denied");
       },
       {
@@ -58,6 +60,7 @@ export default function InstallerDisplayRegister() {
     );
   }, [loggedIn]);
 
+  /* ================= LOGIN ================= */
   const handleLogin = () => {
     const u = username.trim().toLowerCase();
     const p = password.trim();
@@ -70,9 +73,73 @@ export default function InstallerDisplayRegister() {
     }
   };
 
+  /* ================= FORM ================= */
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  /* ================= SAVE INSTALLATION ================= */
+  const handleSaveInstallation = async () => {
+    if (!form.displayName || !form.locationName) {
+      alert("Please fill all required fields");
+      return;
+    }
+
+    if (!form.latitude || !form.longitude) {
+      alert("Location not captured");
+      return;
+    }
+
+    setSaving(true);
+
+    const payload = {
+      deviceId,
+      displayName: form.displayName,
+      locationName: form.locationName,
+      installerName: form.installerName,
+      latitude: form.latitude,
+      longitude: form.longitude,
+      method: "physical",
+    };
+
+    try {
+      const res = await fetch("http://localhost:8000/displays", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.detail || "Installation failed");
+        setSaving(false);
+        return;
+      }
+
+      setSuccess(true);
+    } catch (err) {
+      alert("Backend not reachable");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ================= SUCCESS SCREEN ================= */
+  if (success) {
+    return (
+      <div style={{ maxWidth: 450, padding: 20 }}>
+        <h2>✅ Installation Complete</h2>
+        <p>Display has been successfully registered.</p>
+
+        <div style={{ background: "#f2f2f2", padding: 10 }}>
+          <p><b>Device:</b> {deviceId}</p>
+          <p><b>Display:</b> {form.displayName}</p>
+          <p><b>Location:</b> {form.locationName}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: 450, padding: 20 }}>
@@ -161,6 +228,14 @@ export default function InstallerDisplayRegister() {
             <p><b>Lat:</b> {form.latitude}</p>
             <p><b>Lng:</b> {form.longitude}</p>
           </div>
+
+          <button
+            onClick={handleSaveInstallation}
+            disabled={saving}
+            style={{ marginTop: 20, padding: "10px 15px" }}
+          >
+            {saving ? "Saving..." : "💾 Save Installation"}
+          </button>
         </>
       )}
     </div>
