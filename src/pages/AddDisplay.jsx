@@ -35,7 +35,8 @@ export default function DisplayDevice() {
         <div style={{ background: "white", padding: 15, marginTop: 20 }}>
           <QRCodeCanvas
             size={180}
-            value={`${window.location.origin}/install?deviceId=${DEVICE_UID}`}
+            value={`${window.location.origin}/?install=1&deviceId=${DEVICE_UID}`}
+
           />
           <p style={{ color: "black", marginTop: 10 }}>
             {DEVICE_UID}
